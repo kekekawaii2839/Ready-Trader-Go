@@ -12,8 +12,8 @@
 7. _mult_rail_pos: A bot modified from _mult_rail.py, added dynamic volumes
 
 ## Contributers
-+ [LHLKEVIN013](https://github.com/LHLKEVIN0713) \
-+ [E70N4N](https://github.com/E70N4N) \
++ [LHLKEVIN013](https://github.com/LHLKEVIN0713)
++ [E70N4N](https://github.com/E70N4N)
 
 ## Development Log
 1. Feb.12.2023--Feb.15.2023:\
