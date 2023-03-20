@@ -23,7 +23,7 @@
 &ensp;&ensp;Implemented _MACD.py\
 &ensp;&ensp;Debugging and testing
 4. Feb.18.2023--Feb.20.2030:\
-&ensp;&ensp;Studying strategies about VWAP and Bolling\
+&ensp;&ensp;Studying strategies about VWAP and Bolling bonds\
 &ensp;&ensp;Implemented _vwap.py\
 &ensp;&ensp;Considering using linear regression and polynomial fitting to predict price trend
 5. Feb.21.2023--Feb.24.2030:\
