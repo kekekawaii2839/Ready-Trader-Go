@@ -19,7 +19,7 @@ This is the code repository for our team, which includes multiple versions of au
 1. Feb.12.2023--Feb.15.2023:
     > We figured out concepts in RTG games, like ETF, future, position, etc.
 2. Feb.15.2023--Feb.16.2023:
-    > ;Read source code in https://github.com/HackMelbourne/Optiver_RTG_Workshop \
+    > Read source code in https://github.com/HackMelbourne/Optiver_RTG_Workshop \
     > Brainstorming about strategies that are NOT market neutral\
     > Implemented and testing _cta.py and _cloud.py\
     > Started using pyplot and analyzing trading data
