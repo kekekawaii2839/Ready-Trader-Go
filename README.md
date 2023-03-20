@@ -27,7 +27,7 @@
 &ensp;&ensp;Implemented _vwap.py\
 &ensp;&ensp;Considering using linear regression and polynomial fitting to predict price trend
 5. Feb.21.2023--Feb.24.2030:\
-&ensp;&ensp;Updated _vwap.py using linear regression and imported numpy\
+&ensp;&ensp;Updated _vwap.py using linear regression and imported numpy
 6. Feb.25.2023:\
 &ensp;&ensp;Implemented _linear.py, modified from _vwap.py\
 &ensp;&ensp;Made a huge breakthough in TradeProfit by _linear.py
