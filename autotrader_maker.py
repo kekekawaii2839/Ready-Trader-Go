@@ -22,33 +22,12 @@ from typing import List
 
 from ready_trader_go import BaseAutoTrader, Instrument, Lifespan, MAXIMUM_ASK, MINIMUM_BID, Side
 
-import numpy as np
-import matplotlib
 
-matplotlib.use('Agg')
-from matplotlib import pyplot
-import gc
-
-LOT_SIZE = 20
+LOT_SIZE = 10
 POSITION_LIMIT = 100
 TICK_SIZE_IN_CENTS = 100
 MIN_BID_NEAREST_TICK = (MINIMUM_BID + TICK_SIZE_IN_CENTS) // TICK_SIZE_IN_CENTS * TICK_SIZE_IN_CENTS
 MAX_ASK_NEAREST_TICK = MAXIMUM_ASK // TICK_SIZE_IN_CENTS * TICK_SIZE_IN_CENTS
-OFFSET = 100
-
-
-def saveimg(name: str, a: List[int], b: List[int], cc: List[int]):
-    fig = pyplot.figure(figsize=(min(len(a) / 10, 50), min(len(b) / 10, 50)), clear=True)
-    pp = fig.add_subplot(111)
-    pp.grid(True)
-    ax = pp.plot(a, c='black')
-    bx = pp.plot(b, c='green')
-    cx = pp.plot(cc, c='red')
-    pyplot.savefig(name, dpi=100)
-    pyplot.clf()
-    pyplot.close(fig)
-    del fig
-    gc.collect()
 
 
 class AutoTrader(BaseAutoTrader):
@@ -69,11 +48,8 @@ class AutoTrader(BaseAutoTrader):
         self.asks = set()
         self.ask_id = self.ask_price = self.bid_id = self.bid_price = self.position = 0
         #
-        self.etf_price = list()
+        self.ETF_price = list()
         self.fut_price = list()
-        self.delta = list()
-        self.upper_rail = list()
-        self.lower_rail = list()
 
     def on_error_message(self, client_order_id: int, error_message: bytes) -> None:
         """Called when the exchange detects an error.
@@ -104,34 +80,20 @@ class AutoTrader(BaseAutoTrader):
         prices are reported along with the volume available at each of those
         price levels.
         """
-        self.logger.info("received order book for instrument %d with sequence number %d", instrument,
-                         sequence_number)
 
-        if ask_prices[0] == 0 or bid_prices[0] == 0:
+        if (ask_volumes[0]+bid_volumes[0]==0):
             return
-        if ask_volumes[0] + bid_volumes[0] == 0:
-            return
+
+        vwap = (bid_prices[0] * ask_volumes[0] + ask_prices[0] * bid_volumes[0]) / (bid_volumes[0] + ask_volumes[0])
+        pos_adj = -0.7 * self.position / 100 * TICK_SIZE_IN_CENTS
+        new_bid_price = int((vwap + pos_adj) // TICK_SIZE_IN_CENTS * TICK_SIZE_IN_CENTS) - 300
+        new_ask_price = new_bid_price + 200
 
         if instrument == Instrument.ETF:
-            self.etf_price.append((ask_prices[0] + bid_prices[0]) / 2)
+            self.ETF_price.append(vwap)
+
         if instrument == Instrument.FUTURE:
-            self.fut_price.append((ask_prices[0] + bid_prices[0]) / 2)
-
-        if len(self.etf_price) > 0 and len(self.fut_price) > 0:
-            self.delta.append(self.etf_price[-1] - self.fut_price[-1])
-            std = np.std(self.delta)
-            self.upper_rail.append(std + OFFSET)
-            self.lower_rail.append(-(std + OFFSET))
-
-        if len(self.delta) > 5:
-            saveimg('b.png',
-                    self.delta[5:],
-                    self.upper_rail[5:],
-                    self.lower_rail[5:])
-
-        """if instrument == Instrument.ETF:
-            new_bid_price = int(self.lower_rail[-1] + self.fut_price[-1]) // 100 * 100
-            new_ask_price = int(self.upper_rail[-1] + self.fut_price[-1]) // 100 * 100
+            self.fut_price.append(vwap)
 
             if self.bid_id != 0 and new_bid_price not in (self.bid_price, 0):
                 self.send_cancel_order(self.bid_id)
@@ -140,17 +102,18 @@ class AutoTrader(BaseAutoTrader):
                 self.send_cancel_order(self.ask_id)
                 self.ask_id = 0
 
-            if self.bid_id == 0 and new_bid_price != 0 and self.position + LOT_SIZE < POSITION_LIMIT:
-                self.bid_id = next(self.order_ids)
-                self.bid_price = new_bid_price
-                self.send_insert_order(self.bid_id, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
-                self.bids.add(self.bid_id)
-
-            if self.ask_id == 0 and new_ask_price != 0 and self.position - LOT_SIZE > -POSITION_LIMIT:
-                self.ask_id = next(self.order_ids)
-                self.ask_price = new_ask_price
-                self.send_insert_order(self.ask_id, Side.SELL, new_ask_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
-                self.asks.add(self.ask_id)"""
+            if len(self.ETF_price) > 0 and len(self.fut_price) > 0:
+                if self.bid_id == 0 and (self.ETF_price[-1] < self.fut_price[-1]) and self.position + LOT_SIZE < POSITION_LIMIT:
+                    self.bid_id = next(self.order_ids)
+                    self.bid_price = new_bid_price
+                    self.send_insert_order(self.bid_id, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
+                    self.bids.add(self.bid_id)
+    
+                if self.ask_id == 0 and (self.ETF_price[-1] > self.fut_price[-1]) and self.position - LOT_SIZE > -POSITION_LIMIT:
+                    self.ask_id = next(self.order_ids)
+                    self.ask_price = new_ask_price
+                    self.send_insert_order(self.ask_id, Side.SELL, new_ask_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
+                    self.asks.add(self.ask_id)
 
     def on_order_filled_message(self, client_order_id: int, price: int, volume: int) -> None:
         """Called when one of your orders is filled, partially or fully.
