@@ -3,13 +3,13 @@
 This is the code repository for our team, which includes multiple versions of autotraders that were jointly conceived and implemented by lhl and ayd. The two of us started learning, brainstorming, and constantly experimenting since mid-February 2023, and finally presented these versions with different strategies.
 
 ## Main Versions
-    > 1. _cloud.py: Inspired by https://github.com/jamesdinh12/Optiver-RTG-2022 and the 'Ichimoku Cloud' strategy
-    > 2. _dyna.py: The best performed bot using both dynamic standard deviation of price spread and dynamic volumes for active orders
-    > 3. _linear.py: The best performed bot in NON-marketing neutral strategies, using linear regression
-    > 4. _maker.py: The first bot using marketing neutral strategy
-    > 5. _rail.py: A breakthough bot
-    > 6. _mult_rail: A strong bot using 2 "rails"
-    > 7. _mult_rail_pos: A bot modified from _mult_rail.py, added dynamic volumes
+1. _cloud.py: Inspired by https://github.com/jamesdinh12/Optiver-RTG-2022 and the 'Ichimoku Cloud' strategy
+2. _dyna.py: The best performed bot using both dynamic standard deviation of price spread and dynamic volumes for active orders
+3. _linear.py: The best performed bot in NON-marketing neutral strategies, using linear regression
+4. _maker.py: The first bot using marketing neutral strategy
+5. _rail.py: A breakthough bot
+6. _mult_rail: A strong bot using 2 "rails"
+7. _mult_rail_pos: A bot modified from _mult_rail.py, added dynamic volumes
 
 ## Contributers
 + [LHLKEVIN013](https://github.com/LHLKEVIN0713)
